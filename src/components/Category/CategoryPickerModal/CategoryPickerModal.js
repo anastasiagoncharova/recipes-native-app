@@ -8,7 +8,7 @@ import {
   Image,
 } from 'react-native';
 import styles from './styles';
-import { categories } from '../../data/dataArrays';
+import { categories } from '../../../data/dataArrays';
 
 export default function CategoryPickerModal({ onSelectCategory, visible, onClose }) {
   function handleCategoryPress(category) {

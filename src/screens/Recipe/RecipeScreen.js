@@ -15,7 +15,7 @@ import {
   getCategoryById,
 } from "../../data/MockDataAPI";
 import BackButton from "../../components/BackButton/BackButton";
-import ViewIngredientsButton from "../../components/ViewIngredientsButton/ViewIngredientsButton";
+import ViewIngredientsButton from "./ViewIngredientsButton/ViewIngredientsButton";
 
 const { width: viewportWidth } = Dimensions.get("window");
 

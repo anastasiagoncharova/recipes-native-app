@@ -6,7 +6,6 @@ const recipeSlice = createSlice({
   initialState: { recipes: recipes },
   reducers: {
     addRecipe: (state, action) => {
-      console.log('new recipe' + action.payload);
       state.recipes.push(action.payload);
     },
   },

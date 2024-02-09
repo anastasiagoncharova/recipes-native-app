@@ -1,5 +1,9 @@
-import { StyleSheet } from 'react-native';
-import { RecipeCard } from '../../AppStyles';
+import { StyleSheet, Dimensions } from 'react-native';
+import { RecipeCard } from '../../../AppStyles';
+
+const { width, height } = Dimensions.get('window');
+const SCREEN_WIDTH = width < height ? width : height;
+const RECIPE_ITEM_MARGIN = 60;
 
 const styles = StyleSheet.create({
   container: RecipeCard.container,
@@ -10,29 +14,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
+    width: (SCREEN_WIDTH - RECIPE_ITEM_MARGIN),
     backgroundColor: '#ffffff',
     borderRadius: 10,
-    padding: 20,
     alignItems: 'center',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 20,
-  },
-  categoriesItemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  categoriesPhoto: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  categoriesName: {
-    fontSize: 18,
   },
   closeButton: {
     marginTop: 20,
@@ -41,9 +31,11 @@ const styles = StyleSheet.create({
   categoriesItemContainer: {
     flex: 1,
     margin: 10,
+    width: (SCREEN_WIDTH - RECIPE_ITEM_MARGIN - 20),
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 215,
+    height: 'auto',
     borderColor: '#cccccc',
     borderWidth: 0.5,
     borderRadius: 20,
@@ -60,8 +52,7 @@ const styles = StyleSheet.create({
       height: 3
     },
     shadowRadius: 5,
-    shadowOpacity: 1.0,
-    elevation: 3
+    shadowOpacity: 1.0
   },
   categoriesName: {
     flex: 1,

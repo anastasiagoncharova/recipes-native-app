@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Alert,
-  Text,
-  Image,
-  TouchableOpacity,
-  FlatList,
-} from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import Input from '../../components/Input/Input';
 import styles from './styles';
-import { categories } from '../../data/dataArrays';
 import { useDispatch } from 'react-redux';
-import CategoryPickerModal from '../CategoryPickerModal/CategoryPickerModal';
 import { addRecipe } from '../../store/recipeSlice';
 import Button from '../../components/CommonButton/CommonButton';
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import TakePhoto from '../../components/TakePhoto/TakePhoto';
+import UploadPhoto from '../../components/UploadPhoto/UploadPhoto';
+import Category from '../../components/Category/Category';
+import PhotoPreview from '../../components/PhotoPreview/PhotoPreview';
 
 export default function AddRecipeScreen({ navigation }) {
   const [photoUrl, setPhotoUrl] = useState('');
   const [photoUrlArray, setPhotoUrlArray] = useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [isCategoryModalOpen, setCategoryModalOpen] = useState(false);
   const dispatch = useDispatch();
   const [inputs, setInputs] = useState({
     title: {
@@ -47,8 +39,20 @@ export default function AddRecipeScreen({ navigation }) {
     });
   }
 
+  const takePhotoUrl = (url) => {
+    setPhotoUrl(url);
+  };
+
+  const uploadPhotoUrl = (urls) => {
+    setPhotoUrlArray(urls);
+    setPhotoUrl(urls[0]);
+  };
+
+  const setCategoryId = (categoryId) => {
+    setSelectedCategoryId(categoryId);
+  };
+
   async function onSubmit(recipeData) {
-    console.log(photoUrl);
     const newRecipe = {
       recipeId: 46,
       categoryId: selectedCategoryId,
@@ -81,7 +85,6 @@ export default function AddRecipeScreen({ navigation }) {
     const titleIsValid = recipeData.title;
     const timeIsValid = recipeData.time;
     const descriptionIsValid = recipeData.description;
-
     if (titleIsValid && timeIsValid && descriptionIsValid) {
       onSubmit(recipeData);
     } else {
@@ -96,82 +99,6 @@ export default function AddRecipeScreen({ navigation }) {
         };
       });
     }
-  }
-
-  function openCategoryModal() {
-    setCategoryModalOpen(true);
-  }
-
-  function closeCategoryModal() {
-    setCategoryModalOpen(false);
-  }
-
-  async function takePhoto() {
-    try {
-      const cameraResp = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        quality: 1,
-      });
-
-      if (!cameraResp.canceled) {
-        saveImages(cameraResp.assets);
-      }
-    } catch (e) {
-      Alert.alert('Error Uploading Image ' + e.message);
-    }
-  }
-
-  async function uploadPhoto() {
-    try {
-      const cameraResp = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        quality: 1,
-        allowsMultipleSelection: true,
-        base64: false,
-      });
-
-      if (!cameraResp.canceled) {
-        saveImages(cameraResp.assets);
-      }
-    } catch (e) {
-      Alert.alert('Error Uploading Image ' + e.message);
-    }
-  }
-
-  async function saveImages(assets) {
-    console.log('uri - ' + assets[0].uri);
-    const url = await saveAndAddImage(assets[0].uri);
-    setPhotoUrl(url);
-    console.log('photoUrl' + photoUrl);
-    const photoUrls = [];
-    assets.forEach(async (asset) => {
-      const url = await saveAndAddImage(asset.uri);
-      photoUrls.push(url);
-    });
-    setPhotoUrlArray(photoUrls);
-  }
-
-  async function saveAndAddImage(imageUri) {
-    try {
-      const fileName = `${Date.now()}_uploadedImage.jpg`;
-      const destinationPath = `${FileSystem.documentDirectory}${fileName}`;
-
-      await FileSystem.copyAsync({
-        from: imageUri,
-        to: destinationPath,
-      });
-      console.log(destinationPath);
-      return destinationPath;
-    } catch (error) {
-      console.error('Error saving image:', error);
-      return '';
-    }
-  }
-
-  function selectCategory(categoryId) {
-    console.log(categoryId);
-    setSelectedCategoryId(categoryId);
   }
 
   return (
@@ -207,19 +134,23 @@ export default function AddRecipeScreen({ navigation }) {
           value: inputs.description.value,
         }}
       />
-      <CategoryPickerModal
-        onSelectCategory={selectCategory}
-        visible={isCategoryModalOpen}
-        onClose={closeCategoryModal}
-      />
-      <Button onPress={openCategoryModal}>Select Category</Button>
-      <Button onPress={takePhoto}>Take a photo</Button>
-      <Button onPress={uploadPhoto}>Upload photo</Button>
+      <Category setCategory={setCategoryId}>
+        <Button>Select Category</Button>
+      </Category>
+      <TakePhoto setPhotoUrl={takePhotoUrl}>
+        <Button>Take a photo</Button>
+      </TakePhoto>
+      <UploadPhoto setPhotoUrls={uploadPhotoUrl}>
+        <Button>Upload photo</Button>
+      </UploadPhoto>
+      {photoUrl && <PhotoPreview uri={photoUrl}></PhotoPreview>}
       <View style={styles.buttonContainer}>
-        <Button mode='flat' onPress={cancelHandler}>
-          Cancel
-        </Button>
-        <Button onPress={submitHandler}>Submit</Button>
+        <TouchableOpacity onPress={cancelHandler}>
+          <Button mode='flat'>Cancel</Button>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={submitHandler}>
+          <Button>Submit</Button>
+        </TouchableOpacity>
       </View>
     </View>
   );
